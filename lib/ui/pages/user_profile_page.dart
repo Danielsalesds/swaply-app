@@ -1,23 +1,55 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:swaply/ui/widgets/routes.dart';
 
-class UserProfilePage extends StatelessWidget {
-  final String? userPhotoUrl; // URL da foto do usuário, pode ser null
-  final String userEmail; // Email do usuário
+class UserProfilePage extends StatefulWidget {
+
   final VoidCallback onLogout; // Callback para o botão de logout
 
   const UserProfilePage({
     super.key,
-    this.userPhotoUrl,
-    required this.userEmail,
     required this.onLogout,
   });
 
   @override
+  State<UserProfilePage> createState() => _UserProfilePageState();
+}
+
+class _UserProfilePageState extends State<UserProfilePage> {
+  User? user;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkUserSession();
+  }
+
+  Future<void> _checkUserSession() async {
+    // Obtenha o usuário atual
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) {
+      // Se não houver usuário logado, redirecione para a página de login
+      Navigator.pushReplacementNamed(context, '/login');
+    } else {
+      // Se o usuário estiver logado, atualize o estado
+      setState(() {
+        user = currentUser;
+      });
+    }
+  }
+  @override
   Widget build(BuildContext context) {
+    
+
+  final String? userPhotoUrl = user?.photoURL; // URL da foto do usuário, pode ser null
+  final String userEmail = user?.email??'Emil não disponivel'; // Email do usuário
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Perfil do Usuário"),
         backgroundColor: Colors.blue,
+        
       ),
       body: Container(
         color: Colors.white, // Fundo branco
@@ -30,7 +62,7 @@ class UserProfilePage extends StatelessWidget {
                 radius: 60, // Tamanho da imagem
                 backgroundColor: Colors.grey.shade200, // Cor de fundo padrão
                 backgroundImage:
-                    userPhotoUrl != null ? NetworkImage(userPhotoUrl!) : null,
+                    userPhotoUrl != null ? NetworkImage(userPhotoUrl) : null,
                 child: userPhotoUrl == null
                     ? const Icon(Icons.person, size: 60, color: Colors.grey)
                     : null, // Ícone de perfil padrão se não houver imagem
@@ -68,7 +100,13 @@ class UserProfilePage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
-                onPressed: onLogout,
+                onPressed: () async {
+                  await FirebaseAuth.instance.signOut();
+                   setState(() {
+                    user = null; // Limpa a variável user para simular o logout
+                  });
+                  Navigator.pushReplacementNamed(context, ConfigRoutes.home);
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   minimumSize: const Size(double.infinity, 50), // Largura total

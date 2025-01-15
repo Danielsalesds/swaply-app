@@ -4,9 +4,14 @@ import 'package:provider/provider.dart';
 import 'package:swaply/services/auth-service.dart';
 import 'package:swaply/ui/pages/user_profile_page.dart';
 
-class MenuPage extends StatelessWidget {
-  MenuPage({super.key});
+class MenuPage extends StatefulWidget {
+  const MenuPage({super.key});
 
+  @override
+  State<MenuPage> createState() => _MenuPageState();
+}
+
+class _MenuPageState extends State<MenuPage> {
   @override
   Widget build(BuildContext context) {
     // Obter o usuário autenticado
@@ -24,12 +29,10 @@ class MenuPage extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) => UserProfilePage(
-                userPhotoUrl: userPhotoUrl,
-                userEmail: userEmail,
                 onLogout: () {
                   final authService =
                       Provider.of<AuthService>(context, listen: false);
-                  authService.signOut();
+                      authService.signOut();
                 },
               ),
             ),
