@@ -67,4 +67,13 @@ class AuthService{
       }
     }catch (e){throw Exception('Erro ao enviar e-mail de recuperação: $e');}
   }
+   String getCurrentUser(){
+    return auth.currentUser!.uid;
+  }
+  String? getCurrentUserEmail(){
+    return auth.currentUser!.email;
+  }
+  Future<void> signOut() async{
+    return await auth.signOut();
+  }
 }

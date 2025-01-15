@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -5,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:swaply/core/confg_provider.dart';
 import 'package:swaply/services/auth-service.dart';
 import 'package:swaply/ui/pages/home_pege.dart';
+import 'package:swaply/ui/widgets/item_form_card.dart';
 import 'package:swaply/ui/widgets/login_or_register_page.dart';
 import 'firebase_options.dart'; 
 
@@ -32,7 +34,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 81, 196, 106)),
           useMaterial3: true,
         ),
-        home: const HomePage(),
+        home:  const HomePage(),
       ),
     );
   }

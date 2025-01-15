@@ -8,13 +8,32 @@ class FirestoreService{
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   //final NotificationService _notificationService = NotificationService();
 
-Future<void> addUser(String id,String email) async {
-  await FirebaseFirestore.instance.collection('users').add({
-  'email': email,
-  'uid': id,
-  'createdAt': FieldValue.serverTimestamp(),
-  });
-}
+  Future<void> addUser(String id,String email) async {
+    await FirebaseFirestore.instance.collection('users').doc(id).set({
+    'email': email,
+    'uid': id,
+    'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+  Future<void> getUser(String id) async {
+    final DocumentSnapshot userDoc =
+    await FirebaseFirestore.instance.collection('users').doc(id).get();
+    if (userDoc.exists) {
+    print(userDoc.data());
+    }
+  }
+  //Obter Todos os Documentos de uma Coleção
+  Future<void> getAllUsers() async {
+    final QuerySnapshot querySnapshot =
+    await FirebaseFirestore.instance.collection('users').get();
+    for (var doc in querySnapshot.docs) {
+    print(doc.data());
+    }
+  }
+  //Atualizar Campos Específicos
+  Future<void> updateUser(String id, Map<String, dynamic> updates) async {
+    await FirebaseFirestore.instance.collection('users').doc(id).update(updates);
+  }
 
   //Retorna lista de itens que atualiza automaticamente quando a coleção no Firestore muda.
   Stream<DocumentSnapshot> getDocuments(String colecao, String id){

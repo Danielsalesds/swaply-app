@@ -26,12 +26,9 @@ class _RegisterPageState extends State<RegisterPage> {
 
   void signUp() async{
     if(senhaController.value.text != repSenhaController.value.text){
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Certifique-se de que os campos de senha sejam iguais."))
-      
-      );
-      errorMessage = 'Certifique-se de que os campos de senha sejam iguais.';
-      
+      setState(() {
+        errorMessage = 'Certifique-se de que os campos de senha sejam iguais.';
+      });
       return;
     }
     final AuthService authService = Provider.of<AuthService>(context, listen:false);
