@@ -6,8 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:swaply/core/confg_provider.dart';
 import 'package:swaply/services/auth-service.dart';
 import 'package:swaply/ui/pages/home_pege.dart';
-import 'package:swaply/ui/widgets/item_form_card.dart';
 import 'package:swaply/ui/widgets/login_or_register_page.dart';
+import 'package:swaply/ui/widgets/routes.dart';
 import 'firebase_options.dart'; 
 
 Future <void> main() async{
@@ -34,7 +34,8 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 81, 196, 106)),
           useMaterial3: true,
         ),
-        home:  const HomePage(),
+        routes: ConfigRoutes.routes,
+        initialRoute: ConfigRoutes.home,
       ),
     );
   }

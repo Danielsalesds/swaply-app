@@ -1,9 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:swaply/ui/widgets/custom_bottom_navigation_bar.dart';
-import 'package:swaply/ui/widgets/item_form_card.dart';
+import 'package:swaply/ui/widgets/initial_home.dart';
 import 'package:swaply/ui/widgets/login_or_register_page.dart';
-import 'package:swaply/ui/widgets/menu_home.dart';  // Importe o seu widget personalizado
+import 'package:swaply/ui/widgets/menu_home.dart';
+import 'package:swaply/ui/widgets/section_cadastro_item.dart';  // Importe o seu widget personalizado
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -26,7 +27,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Página Inicial')),
+      //appBar: AppBar(title: const Text('Página Inicial')),
       body: Center(
         // Aqui você pode retornar diferentes widgets dependendo do item selecionado
         child: _getSelectedPage(),  
@@ -42,7 +43,7 @@ class _HomePageState extends State<HomePage> {
   Widget _getSelectedPage() {
     switch (_selectedIndex) {
       case 0:
-        return const Text('Página Inicial');
+        return InitialHome();
       case 1:
         return const Text('Buscar');
       case 2:
@@ -51,7 +52,7 @@ class _HomePageState extends State<HomePage> {
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.active) {
                     final User? user = snapshot.data;
-                    return user == null ? const LoginOrRegisterPage() : const ItemForm();
+                    return user == null ? const LoginOrRegisterPage() : const SectionCadastroItem();
                   } else {
                     return const CircularProgressIndicator();
                   }
@@ -68,7 +69,7 @@ class _HomePageState extends State<HomePage> {
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.active) {
                     final User? user = snapshot.data;
-                    return user == null ? const LoginOrRegisterPage() : MenuPage();
+                    return user == null ? const LoginOrRegisterPage() : const MenuPage();
                   } else {
                     return const CircularProgressIndicator();
                   }

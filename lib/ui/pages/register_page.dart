@@ -8,6 +8,7 @@ import 'package:swaply/ui/widgets/error_message.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_password_form_field.dart';
 import '../widgets/custom_text_form_field.dart';
+import 'package:swaply/model/user_model.dart';
 
 class RegisterPage extends StatefulWidget{
   const RegisterPage({super.key, this.onTap});
@@ -35,7 +36,17 @@ class _RegisterPageState extends State<RegisterPage> {
     final FirestoreService firebaseFirestore = FirestoreService();
     try {
       UserCredential credential = await authService.createUserAccount(emailController.value.text, senhaController.value.text);
-      await firebaseFirestore.addUser(credential.user!.uid, emailController.value.text);
+
+      // Crie o UserModel com os dados necessários
+      final userModel = UserModel(
+        id: credential.user!.uid,
+        name: '',
+        email: emailController.value.text,
+        photoUrl: credential.user?.photoURL,
+        idMensagem: '',
+        idItens: []
+      );
+      await firebaseFirestore.addUserModel(credential.user!.uid, userModel);
       // Limpa a mensagem de erro após o login bem-sucedido
       errorMessage = null;
     }on Exception catch (e) {

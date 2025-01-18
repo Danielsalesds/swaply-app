@@ -48,7 +48,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Perfil do Usuário"),
-        backgroundColor: Colors.blue,
+        backgroundColor: const Color(0xFFFFA726),
         
       ),
       body: Container(
@@ -81,7 +81,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  const Icon(Icons.email, color: Colors.blue), // Ícone do email
+                  const Icon(Icons.email, color: Color(0xFF000000)), // Ícone do email
                   const SizedBox(width: 16),
                   Text(
                     userEmail,
@@ -102,13 +102,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
               child: ElevatedButton(
                 onPressed: () async {
                   await FirebaseAuth.instance.signOut();
+                  
                    setState(() {
                     user = null; // Limpa a variável user para simular o logout
                   });
                   Navigator.pushReplacementNamed(context, ConfigRoutes.home);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                  backgroundColor: const Color(0xFF212121),
                   minimumSize: const Size(double.infinity, 50), // Largura total
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),

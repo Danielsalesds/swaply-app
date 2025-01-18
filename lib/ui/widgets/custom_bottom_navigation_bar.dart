@@ -23,7 +23,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         // Cor de destaque do ícone selecionado
-        selectedItemColor: Colors.orange, 
+        selectedItemColor: const Color(0xFFFF9800), 
         // Cor dos ícones não selecionados
         unselectedItemColor: Colors.grey, 
         currentIndex: selectedIndex,

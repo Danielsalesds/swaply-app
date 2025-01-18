@@ -2,61 +2,63 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:swaply/services/auth-service.dart';
-import 'package:swaply/ui/pages/user_profile_page.dart';
+import 'package:swaply/ui/widgets/routes.dart'; // Supondo que existe uma página de formulário de itens
 
-class MenuPage extends StatefulWidget {
-  const MenuPage({super.key});
+class SectionCadastroItem extends StatefulWidget {
+  const SectionCadastroItem({super.key});
 
   @override
-  State<MenuPage> createState() => _MenuPageState();
+  State<SectionCadastroItem> createState() => _SectionCadastro();
 }
 
-class _MenuPageState extends State<MenuPage> {
+class _SectionCadastro extends State<SectionCadastroItem> {
   @override
   Widget build(BuildContext context) {
     // Obter o usuário autenticado
     final user = FirebaseAuth.instance.currentUser;
     final authService = Provider.of<AuthService>(context, listen: false);
-    // Pegar informações do usuário
-    final userPhotoUrl = user?.photoURL;
-    final userEmail = user?.email ?? "Email não disponível";
+
     // Defina as opções do menu dentro do `build`, para que o `context` esteja acessível
     final List<MenuOption> menuOptions = [
       MenuOption(
-        icon: Icons.person,
-        title: 'Minha Conta',
+        icon: Icons.book,
+        title: 'Livros',
         onTap: () {
-          Navigator.push(
+          Navigator.pushNamed(
             context,
-            MaterialPageRoute(
-              builder: (context) => UserProfilePage(
-                onLogout: () {
-                   authService.signOut();
-                },
-              ),
-            ),
+            ConfigRoutes.itemForm,
           );
         },
       ),
       MenuOption(
-        icon: Icons.ads_click,
-        title: 'Meus Anúncios',
-        onTap: () => print('Meus Anúncios'),
+        icon: Icons.category,
+        title: 'Objetos em geral',
+        onTap: () {
+          Navigator.pushNamed(
+            context,
+            ConfigRoutes.itemForm,
+          );
+        },
       ),
       MenuOption(
-        icon: Icons.info,
-        title: 'Sobre',
-        onTap: () => print('Sobre'),
+        icon: Icons.devices_other,
+        title: 'Celulares, computadores, eletrônicos em geral',
+        onTap: () {
+          Navigator.pushNamed(
+            context,
+            ConfigRoutes.itemForm,
+          );
+        },
       ),
     ];
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Menu"),
+        title: const Text("Inserir Item"),
         backgroundColor: const Color(0xFFFFA726),
       ),
       body: Container(
-        padding: const EdgeInsets.all(0), // Para adicionar espaçamento interno ao Container
+        padding: const EdgeInsets.all(0),
         color: Colors.white,
         child: ListView.builder(
           itemCount: menuOptions.length,
@@ -64,7 +66,7 @@ class _MenuPageState extends State<MenuPage> {
             final option = menuOptions[index];
             return ListTile(
               tileColor: Colors.white,
-              leading: Icon(option.icon, color: const Color(0xFF000000)), // Ícone à esquerda
+              leading: Icon(option.icon, color: const Color(0xFF000000)),
               title: Text(
                 option.title,
                 style: const TextStyle(fontSize: 16),
@@ -73,13 +75,12 @@ class _MenuPageState extends State<MenuPage> {
                 Icons.arrow_forward_ios,
                 size: 16,
                 color: Colors.grey,
-              ), // Seta ">" à direita
+              ),
               onTap: option.onTap,
             );
           },
         ),
-      )
-
+      ),
     );
   }
 }

@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:swaply/model/item_model.dart';
+import 'package:swaply/model/user_model.dart';
 
 
 class FirestoreService{
@@ -14,6 +16,9 @@ class FirestoreService{
     'uid': id,
     'createdAt': FieldValue.serverTimestamp(),
     });
+  }
+  Future<void> addUserModel(String id, UserModel userModel) async {
+    await FirebaseFirestore.instance.collection('users').doc(id).set(userModel.toMap());
   }
   Future<void> getUser(String id) async {
     final DocumentSnapshot userDoc =
@@ -31,8 +36,13 @@ class FirestoreService{
     }
   }
   //Atualizar Campos Específicos
-  Future<void> updateUser(String id, Map<String, dynamic> updates) async {
-    await FirebaseFirestore.instance.collection('users').doc(id).update(updates);
+ /// Atualiza os dados do usuário no Firestore utilizando o UserModel
+  Future<void> updateUserModel(UserModel userModel) async {
+    try {
+      await _firestore.collection('users').doc(userModel.id).update(userModel.toMap());
+    } catch (e) {
+      throw Exception("Erro ao atualizar o usuário: $e");
+    }
   }
 
   //Retorna lista de itens que atualiza automaticamente quando a coleção no Firestore muda.
@@ -59,4 +69,27 @@ class FirestoreService{
     await _firestore.collection(colecao).doc(id).get();
     return userDoc.get(campo);
   }
+
+  //-------------ITENS------------------
+  //Salvar Item no banco
+  Future<void> addItem(ItemModel itemModel) async {
+    try {
+      await FirebaseFirestore.instance.collection('itens').add(itemModel.toMap());
+    } catch (e) {
+      throw Exception("Erro ao atualizar o usuário: $e");
+    }
+  }
+  //buscar todos os itens no banco
+  Future<List<ItemModel>> getAllItems() async {
+  try {
+    // Busca todos os documentos da coleção "itens"
+    final querySnapshot = await FirebaseFirestore.instance.collection('itens').get();
+    // Converte os documentos para uma lista de objetos ItemModel
+    return querySnapshot.docs.map(
+      (doc) => ItemModel.fromMap(doc.id, doc.data())).toList();
+    } catch (e) {
+      throw Exception("Erro ao buscar itens: $e");
+    }
+  }
+
 }
