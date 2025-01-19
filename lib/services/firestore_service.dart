@@ -91,5 +91,22 @@ class FirestoreService{
       throw Exception("Erro ao buscar itens: $e");
     }
   }
+  //buscar lista de itens por id especifico
+  Future <List<ItemModel>> getItemsId (String userId) async {
+    try{
+      final querySnapShot = await _firestore.collection('itens').where('userId' ,isEqualTo: userId).get();
+      if (querySnapShot.docs.isEmpty) {
+      // Caso a consulta não encontre itens, você pode lançar uma exceção
+      throw Exception('Nenhum item encontrado para o usuário.');
+      }
+      return querySnapShot.docs.map(
+        (doc)=> ItemModel.fromMap(doc.id, doc.data())
+      ).toList();
+      //tratar lista vazia
+
+    }catch (e){
+      throw Exception('Você não tem itens cadastrado');
+    }
+  }
 
 }
