@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:swaply/model/item_model.dart';
 import 'package:swaply/services/firestore_service.dart';
+import 'package:swaply/ui/widgets/item_anuncio_view.dart';
 import 'package:swaply/ui/widgets/item_card.dart';
 
 class InitialHome extends StatefulWidget {
@@ -42,12 +43,10 @@ class _InitialHomeState extends State<InitialHome> {
       ),
       body: Container(
         color: Colors.white,
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Campo de busca e botão de notificação
-              Padding(
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
                   children: [
@@ -56,17 +55,13 @@ class _InitialHomeState extends State<InitialHome> {
                         decoration: InputDecoration(
                           hintText: 'Buscar',
                           prefixIcon: Icon(Icons.search, color: const Color(0xFF000000)),
-                          //filled: true,
-                          //fillColor: const Color.fromARGB(255, 196, 114, 114),
-                          // Borda quando o TextField não está focado
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12.0),
-                            borderSide: const BorderSide(color: Color(0xFF000000), width: 0.5), // Preta e fina
+                            borderSide: const BorderSide(color: Color(0xFF000000), width: 0.5),
                           ),
-                          // Borda quando o TextField está focado
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12.0),
-                            borderSide: const BorderSide(color: Color(0xFFFFA726), width: 0.5), // Laranja e fina
+                            borderSide: const BorderSide(color: Color(0xFFFFA726), width: 0.5),
                           ),
                         ),
                       ),
@@ -75,15 +70,15 @@ class _InitialHomeState extends State<InitialHome> {
                     IconButton(
                       icon: const Icon(Icons.notifications, color: Color(0xFF000000)),
                       onPressed: () {
-                        // Ação do botão de notificação
+                        print('Notificado');
                       },
                     ),
                   ],
                 ),
               ),
-
-              // Informação de localização
-              const Padding(
+            ),
+            const SliverToBoxAdapter(
+              child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
                 child: Row(
                   children: [
@@ -96,36 +91,41 @@ class _InitialHomeState extends State<InitialHome> {
                   ],
                 ),
               ),
-              const Divider(
+            ),
+            const SliverToBoxAdapter(
+              child: Divider(
                 color: Colors.grey,
                 thickness: 1,
                 height: 32,
               ),
-
-              // Conteúdo da página
-              GridView.builder(
-                physics: const NeverScrollableScrollPhysics(), // Impede o scroll do GridView
-                shrinkWrap: true, // Ajusta o tamanho do GridView ao conteúdo
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, // Número de itens por linha (2 no caso)
-                  crossAxisSpacing: 8, // Espaçamento horizontal entre os itens
-                  mainAxisSpacing: 8, // Espaçamento vertical entre os itens
-                  childAspectRatio: 2/3, // Proporção dos itens (ajuste conforme necessário)
-                ),
-                itemCount: listItemAll.length, // Número total de itens
-                itemBuilder: (context, index) {
+            ),
+            SliverGrid(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                childAspectRatio: 2 / 3,
+              ),
+              delegate: SliverChildBuilderDelegate(
+                (BuildContext context, int index) {
                   final item = listItemAll[index];
                   return ItemCard(
-                    item: item, // Passa o item para o card
+                    item: item,
                     onTap: () {
-                      print('Item clicado: ${item.title}');
+                      Navigator.push(context, MaterialPageRoute(
+                        builder: (context) => ItemAnuncioView(
+                          item: item,
+                          onLikePressed: () {  print('Gostei!');}, 
+                          onMessagePressed: () { print('Mensagem!'); }, 
+                          ),
+                        ));
                     },
                   );
                 },
+                childCount: listItemAll.length,
               ),
-
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

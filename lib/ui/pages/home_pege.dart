@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:swaply/ui/widgets/custom_bottom_navigation_bar.dart';
 import 'package:swaply/ui/widgets/initial_home.dart';
+import 'package:swaply/ui/widgets/list_message_user.dart';
 import 'package:swaply/ui/widgets/login_or_register_page.dart';
 import 'package:swaply/ui/widgets/menu_home.dart';
 import 'package:swaply/ui/widgets/section_cadastro_item.dart';  // Importe o seu widget personalizado
@@ -43,7 +44,7 @@ class _HomePageState extends State<HomePage> {
   Widget _getSelectedPage() {
     switch (_selectedIndex) {
       case 0:
-        return InitialHome();
+        return const InitialHome();
       case 1:
         return const Text('Buscar');
       case 2:
@@ -62,7 +63,7 @@ class _HomePageState extends State<HomePage> {
       case 3:
         return const Text('Mais');
       case 4:
-        return const Text('Mensagens');
+        return MessageListWidget();
       case 5:
         return StreamBuilder(
                 stream: FirebaseAuth.instance.authStateChanges(),

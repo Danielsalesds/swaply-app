@@ -75,7 +75,7 @@ class _ItemFormState extends State<ItemForm> {
           'title': _titleController.text,
           'description': _descriptionController.text,
           'userId': FirebaseAuth.instance.currentUser!.uid,
-          'imageUrl': 'https://example.com/fake-image-url.jpg', // Coloque a URL da imagem se necessário
+          'imageUrl': null, // Coloque a URL da imagem se necessário
           'city': _cityController.text,
           'idMensagem': '', // Se necessário, inclua um valor
           'createdAt': FieldValue.serverTimestamp(), // Adicionando data de criação

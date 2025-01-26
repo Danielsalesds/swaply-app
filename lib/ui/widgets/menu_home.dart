@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:swaply/services/auth-service.dart';
 import 'package:swaply/ui/pages/user_profile_page.dart';
+import 'package:swaply/ui/widgets/list_anuncio_user.dart';
+import 'package:swaply/ui/widgets/routes.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
@@ -20,7 +22,7 @@ class _MenuPageState extends State<MenuPage> {
     // Pegar informações do usuário
     final userPhotoUrl = user?.photoURL;
     final userEmail = user?.email ?? "Email não disponível";
-    // Defina as opções do menu dentro do `build`, para que o `context` esteja acessível
+    //  opções do menu dentro do `build`, para que o `context` esteja acessível
     final List<MenuOption> menuOptions = [
       MenuOption(
         icon: Icons.person,
@@ -41,7 +43,12 @@ class _MenuPageState extends State<MenuPage> {
       MenuOption(
         icon: Icons.ads_click,
         title: 'Meus Anúncios',
-        onTap: () => print('Meus Anúncios'),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context)=> const ListAnuncioUser(),),
+          );
+        },
       ),
       MenuOption(
         icon: Icons.info,

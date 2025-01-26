@@ -30,7 +30,7 @@ class ItemModel {
       description: data['description'] ?? 'Sem descrição',
       userId: data['userId'],
       //price: (data['price'] ?? 0).toDouble(),
-      imageUrl: data['imageUrl'],
+      imageUrl: data['imageUrl']?? 'Sem imagem',
       idMensagem: data['idMensagem'],
       city: data['city'],
       createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
