@@ -44,6 +44,7 @@ dependencies:
   intl: ^0.20.1
   font_awesome_flutter: ^10.8.0
   chat_bubbles: ^1.7.0
+  rxdart: ^0.28.0
 
 dev_dependencies:
   flutter_test:

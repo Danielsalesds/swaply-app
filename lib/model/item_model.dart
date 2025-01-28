@@ -25,7 +25,7 @@ class ItemModel {
 
   factory ItemModel.fromMap(String id, Map<String, dynamic> data) {
     return ItemModel(
-      id: id,
+      id:id,
       title: data['title'] ?? 'Sem título',
       description: data['description'] ?? 'Sem descrição',
       userId: data['userId'],
@@ -50,4 +50,6 @@ class ItemModel {
       'createdAt': FieldValue.serverTimestamp(),
     };
   }
+   //buscar id do doc
+  
 }

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:swaply/model/item_model.dart';
 import 'package:swaply/model/message_model.dart';
 import 'package:swaply/model/user_model.dart';
@@ -128,21 +129,23 @@ class FirestoreService{
 }
 
   //Cadastrar conversas
-  Future<void> sendMessage(String message, String itemId) async {
+  Future<void> sendMessage(String message, String itemId, String idUserItem, String chatId) async {
     final String senderId = _firebaseAuth.currentUser!.uid;
     final String senderEmail = _firebaseAuth.currentUser!.email.toString();
     final Timestamp timestamp = Timestamp.now();
-
     Message newMessage = Message(
       senderId: senderId,
       senderEmail: senderEmail,
+      chatId: chatId,
       message: message,
       timestamp: timestamp, 
-      receiverId: itemId,
+      receiverId: idUserItem,
+      itemId: itemId, 
     );
 
     await _firestore.collection("messages").add(newMessage.toMap());
-    print("Mensagem enviada com sucesso.");
+    print("Mensagem enviada com sucesso.$chatId");
+    
   }
   //Buscar todas as menssagens
   Stream<QuerySnapshot> getMessages() {
@@ -151,17 +154,88 @@ class FirestoreService{
         .orderBy('timestamp', descending: false)
         .snapshots();
   }
+  //buscar messages filtrando por user logado, dono do item e id do item
+  Stream<QuerySnapshot> getMessagesForItemAndUsers(
+    String itemId, String otherUserId, String currentUserId) {
+      
+    return FirebaseFirestore.instance
+      .collection('messages')
+     // .where('itemId', isEqualTo: itemId)
+      .where('senderId', whereIn: [otherUserId, currentUserId])  // Filtra por ambos os usuários
+      .where('receiverId', whereIn: [currentUserId, otherUserId])// filtrar por ambos os usuários
+      .orderBy('timestamp', descending: true) // Para ordenar pela data
+      .snapshots();
+}
+//Buscar message combinadas de 2 usuarios
+Stream<List<QueryDocumentSnapshot>> combineMessagesStreams(
+  String itemId, 
+  String otherUserId
+) {
+  final String currentUserId = _firebaseAuth.currentUser!.uid;
+  final messagesFromCurrentUser = FirebaseFirestore.instance
+      .collection('messages')
+      .where('itemId', isEqualTo: itemId)
+      .where('senderId', isEqualTo: currentUserId)
+      .where('receiverId', isEqualTo: otherUserId)
+      .snapshots();
+
+  final messagesFromOtherUser = FirebaseFirestore.instance
+      .collection('messages')
+      .where('itemId', isEqualTo: itemId)
+      .where('senderId', isEqualTo: otherUserId)
+      .where('receiverId', isEqualTo: currentUserId)
+      .snapshots();
+
+  return Rx.combineLatest2<QuerySnapshot, QuerySnapshot, List<QueryDocumentSnapshot>>(
+    messagesFromCurrentUser,
+    messagesFromOtherUser,
+    (snapshot1, snapshot2) {
+      // Combina todos os documentos
+      final combinedDocs = [...snapshot1.docs, ...snapshot2.docs];
+      // Ordena os documentos pela data
+      combinedDocs.sort((a, b) {
+        final timestampA = a['timestamp'] as Timestamp;
+        final timestampB = b['timestamp'] as Timestamp;
+        return timestampB.compareTo(timestampA);
+      });
+      return combinedDocs;
+    },
+  );
+}
+
+//---------------------------------------
+
+ //buscar por chatId
+ Stream<QuerySnapshot> getMessagesChat( String chatId) {
+
+  print(">>>>>>>>>>>ChatId: $chatId");
+
+  return _firestore
+      .collection("messages")
+      .where("chatId", isEqualTo: chatId) // Filtra por conversa específica
+      .orderBy("timestamp", descending: true) // Ordena por data, do mais recente ao mais antigo
+      .snapshots();
+}
+
   //filtrar mensagens especificar do item
-  
-  Stream<QuerySnapshot> getMessagesItem(String chatPartnerId) {
+  Stream<QuerySnapshot> getMessagesItem(String chatPartnerId, String itemId ) {
     final String currentUserId = _firebaseAuth.currentUser!.uid;
+    print(">>>>>>>>>>>chatPartnerId/idtem: $chatPartnerId");
+    print(">>>>>>>>>>>idtem: $itemId");
+    print(">>>>>>>>>>>currentUserId: $currentUserId");
     return _firestore
         .collection("messages")
+        .where("itemId", whereIn: [itemId,])//todas referente ao id
         .where("senderId", whereIn: [currentUserId, chatPartnerId]) // Enviadas por qualquer dos dois
         .where("receiverId", whereIn: [currentUserId, chatPartnerId]) // Recebidas por qualquer dos dois
         .orderBy("timestamp", descending: true)
         .snapshots();
   }
+  //teste
+  
+
+  // Exemplo ao enviar uma mensagem
+
   //Buscar as Mensagens do user logado
    Stream<QuerySnapshot> getUserConversations(String userId) {
     return _firestore
@@ -169,8 +243,18 @@ class FirestoreService{
         .where('receiverId', isEqualTo: userId) // Filtra mensagens onde o userId é o destinatário
         .snapshots();
   }
+  /*
+  Future<void> deleteCollection(String collectionPath) async {
+    var collection = FirebaseFirestore.instance.collection(collectionPath);
+    var snapshot = await collection.get();
 
+    // Deleta cada documento dentro da coleção
+    for (var doc in snapshot.docs) {
+      await doc.reference.delete();
+    }
 
+    print('Coleção $collectionPath excluída.');
+  }*/
 
 
 }

@@ -1,15 +1,20 @@
 import 'package:chat_bubbles/bubbles/bubble_special_three.dart';
 import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:swaply/model/message_model.dart';
+import 'package:swaply/services/auth-service.dart';
+import 'package:swaply/services/firestore_service.dart';
 
 class MessageItem extends StatefulWidget {
   final Message message; // modelo Message
   final String currentUserId; // ID do usuário atual
   final String chatPartnerId; // ID do outro usuário na conversa
+  final String itemId;
 
   const MessageItem({
     super.key,
+    required this.itemId,
     required this.message,
     required this.currentUserId,
     required this.chatPartnerId,
@@ -20,21 +25,22 @@ class MessageItem extends StatefulWidget {
 }
 
 class _MessageItemState extends State<MessageItem> {
+    late final FirestoreService firebaseFirestore = FirestoreService();
+    late final AuthService authService;
+ @override
+  void initState() {
+    super.initState();
+    authService = Provider.of<AuthService>(context, listen:false);
+  }
   @override
   Widget build(BuildContext context) {
     // Verifica se a mensagem foi enviada pelo usuário atual
-    var isSender = widget.message.senderId == widget.currentUserId;
+    var isSender = widget.currentUserId == widget.message.senderId;
+    print("Sender ID: ${widget.message.senderId}");
+    print("Current User ID: ${widget.currentUserId}");
 
-    // Verifica se a mensagem pertence à conversa (entre currentUserId e chatPartnerId)
-    var isValidConversation = (widget.message.senderId == widget.currentUserId &&
-            widget.message.receiverId == widget.chatPartnerId) ||
-        (widget.message.senderId == widget.chatPartnerId &&
-            widget.message.receiverId == widget.currentUserId);
 
-    // Se a mensagem não pertence à conversa, retorna um widget vazio
-    if (!isValidConversation) {
-      return const SizedBox.shrink();
-    }
+   
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),

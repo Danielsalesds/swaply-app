@@ -1,5 +1,6 @@
 
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -26,23 +27,51 @@ class _ChatPageState extends State<ChatPage> {
   late final AuthService authService;
   late final FirestoreService firebaseFirestore = FirestoreService();
   final List<Message> listMassageUser = [];
+  late String idChat;
   User?user;
 
   @override
   void initState() {
     super.initState();
     authService = Provider.of<AuthService>(context, listen:false);
+    idChat = generateChatId(authService.auth.currentUser!.uid, widget.item.id, widget.item.userId);
   }
+//Gerar ChatId
+  String generateChatId(String currentUserId, String itemId, String partnerUserId) {
+  // Cria uma lista com os IDs
+  List<String> ids = [currentUserId, partnerUserId];
+  // Ordena os IDs para garantir consistência
+  ids.sort();
+  // Gera o chatId baseado no itemId e nos IDs ordenados
+  return '${itemId}_${ids.join("_")}';
+}
 
 
-  Future<void> sendMessage() async {
+  Future<void> sendMessage(String chatId) async {
     if (_messageController.text.isNotEmpty) {
       try {
+         // Verificar se o currentUser está autenticado e obter o uid
+        String currentUserId = authService.auth.currentUser?.uid ?? '';
+        if (currentUserId.isEmpty) {
+          // Se o usuário não estiver autenticado, você pode lidar com isso aqui
+          print('Usuário não autenticado');
+          
+          return;
+        }
+
+        // Gerar o chatId com os IDs dos usuários
+        
         // Chamando diretamente o método do FirestoreService
         await firebaseFirestore.sendMessage(
           _messageController.text, // Texto da mensagem
-          widget.item.userId,      // ID do usuário que cadastrou o item (receiverId)
+          widget.item.id,      // ID do  item 
+          widget.item.userId, //usuario que cadastrou o item (receiverId)
+          chatId
         );
+        print('IDITEM: ${widget.item.id}');
+        print('IDITEMUser: ${widget.item.userId}');
+        print('ID_DO_CHAT: $chatId');
+
         _messageController.clear(); // Limpa o campo de texto após o envio
       } catch (e) {
         print("Erro ao enviar mensagem: $e");
@@ -71,11 +100,11 @@ class _ChatPageState extends State<ChatPage> {
         children: [
           Expanded(
             child: StreamBuilder(
-              stream: firebaseFirestore.getMessagesItem(widget.item.userId),
+              stream: firebaseFirestore.getMessagesForItemAndUsers(widget.item.id, widget.item.userId, authService.auth.currentUser!.uid),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return Text("Um erro ocorreu. ${snapshot.error}");
-                  
+                  print(snapshot.error);
+                  return Text("Um erro ocorreu. ${snapshot.error}"); 
                 }
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const CircularProgressIndicator();
@@ -87,7 +116,12 @@ class _ChatPageState extends State<ChatPage> {
                   reverse: true, // Mostra as mensagens mais recentes no final
                   children: snapshot.data!.docs.map((document) {
                       final message = Message.fromMap(document.data() as Map<String, dynamic>);  
+                      
+                      print(">>>>>>>>>>>enviado iduser${message.senderId}");
+                      print(">>>>>>>>>>>enviado iduser${message.receiverId}");
                       return MessageItem(
+                        
+                        itemId: widget.item.id,
                         message: message,
                         currentUserId: authService.getCurrentUser(),
                         chatPartnerId: widget.item.userId,
@@ -110,7 +144,9 @@ class _ChatPageState extends State<ChatPage> {
                 child: Container(
                   color: Color(0xFFFFA726),
                   child: IconButton(
-                    onPressed: sendMessage,
+                    onPressed: () {
+                      sendMessage(idChat);
+                    },
                       icon: const Icon(
                         Icons.send,
                         color: Color.fromARGB(255, 243, 243, 243),

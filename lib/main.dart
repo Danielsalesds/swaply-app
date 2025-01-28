@@ -29,6 +29,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: data.providers,
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Swaply',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 81, 196, 106)),
